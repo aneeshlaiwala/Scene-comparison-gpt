@@ -43,8 +43,8 @@ def analyze_with_gpt4(prompt, key):
 
 def analyze_with_gemini(prompt, key):
     headers = {
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "x-goog-api-key": key
     }
     body = {
         "contents": [{"parts": [{"text": prompt}]}]
@@ -52,12 +52,12 @@ def analyze_with_gemini(prompt, key):
     url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
     response = requests.post(url, headers=headers, json=body)
     try:
-        return response.json()['candidates'][0]['content']['parts'][0]['text']
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         return f"Error: {e}\n{response.text}"
 
 def analyze_with_huggingface(prompt, key):
-    url = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
+    url = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
     headers = {"Authorization": f"Bearer {key}"}
     response = requests.post(url, headers=headers, json={"inputs": prompt})
     try:
@@ -69,18 +69,23 @@ if uploaded_files and model_choice and api_key:
     if st.button("🚀 Run Comparative Analysis"):
         scripts = read_scripts(uploaded_files)
 
-        prompt = f"""Compare and analyze the following {len(scripts)} Hindi TV serial scripts.
+        prompt = f"""
+You are an expert in television drama analysis. Analyze and compare the following {len(scripts)} Hindi TV serial scripts in detail. The scripts contain dialogues in English and Hindi (written in English script). DO NOT translate Hindi parts — instead, extract and highlight them.
 
-Do a detailed comparative breakdown of:
-1. Narrative structure (beginning, conflict, resolution)
-2. Character development and screen presence
-3. Dialogue style and language (code-mixed Hinglish, formal, casual)
-4. Sentiment/emotion arc per episode
-5. Themes or moral messaging
-6. Scene transitions and pacing
-7. Any plot inconsistencies or unique twists
+Your response should include the following structured sections:
+1. EXECUTIVE SUMMARY: Key takeaways about tone, themes, character shifts, and language use.
+2. SCRIPT SYNOPSIS: 150–200 word summary for each episode.
+3. HINDI DIALOGUES: List 8–10 notable Hindi (Roman-script) lines that reflect character emotion or plot.
+4. COMPARATIVE ANALYSIS:
+   - Narrative Structure: Beginning, conflict, climax, resolution comparison
+   - Character Development: Presence, emotional arc, maturity, conflict
+   - Dialogue Style: Hinglish patterns, casual vs poetic tone
+   - Themes and Morality: Love, betrayal, revenge, tradition, modernity
+   - Sentiment Arcs: Emotional tone changes across scenes
+   - Scene Variety and Pacing
+   - Visual Imagination and Setting
 
-Scripts:
+Make the response comprehensive and creatively narrated.
 """ + "\n\n---\n\n".join([f"Script {i+1}:\n{scripts[i]}" for i in range(len(scripts))])
 
         with st.spinner("Analyzing scripts..."):
@@ -96,8 +101,8 @@ Scripts:
             except Exception as e:
                 result = f"Error during analysis: {e}"
 
-        st.subheader("🧾 Analysis Result")
+        st.subheader("🧾 Detailed Script Analysis")
         st.markdown(result)
-        st.download_button("💾 Download Analysis", result, file_name="script_analysis.txt")
+        st.download_button("💾 Download Analysis", result, file_name="detailed_script_analysis.txt")
 else:
     st.info("Upload at least one script, select a model, and enter API key.")
