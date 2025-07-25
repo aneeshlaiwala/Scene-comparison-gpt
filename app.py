@@ -1,5 +1,6 @@
+
 import streamlit as st
-import openai
+from openai import OpenAI
 import requests
 from docx import Document
 
@@ -7,28 +8,15 @@ st.set_page_config(page_title="TV Serial Script Comparative Analyzer", layout="w
 st.title("📺 TV Serial Script Comparative Analyzer")
 st.markdown("Upload up to **5 scripts**, select an AI model, and get deep narrative insights.")
 
-# -------------------------------
-# File Upload Section
-# -------------------------------
 uploaded_files = st.file_uploader(
     "📂 Upload up to 5 script files (.txt or .docx)",
     type=['txt', 'docx'],
     accept_multiple_files=True
 )
 
-# -------------------------------
-# Model Selection
-# -------------------------------
 model_choice = st.selectbox("🧠 Choose AI Model", ["GPT-4 (OpenAI)", "Gemini Pro (Google AI)", "Hugging Face"])
-
-# -------------------------------
-# API Key Input
-# -------------------------------
 api_key = st.text_input("🔑 Enter your API Key for the selected model", type="password")
 
-# -------------------------------
-# Script Reader with Error Handling
-# -------------------------------
 def read_scripts(files):
     contents = []
     for f in files:
@@ -44,17 +32,14 @@ def read_scripts(files):
         contents.append(text)
     return contents
 
-# -------------------------------
-# Model Callers
-# -------------------------------
 def analyze_with_gpt4(prompt, key):
-    openai.api_key = key
-    response = openai.ChatCompletion.create(
+    client = OpenAI(api_key=key)
+    response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.5
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 def analyze_with_gemini(prompt, key):
     headers = {
@@ -80,9 +65,6 @@ def analyze_with_huggingface(prompt, key):
     except Exception as e:
         return f"Error: {e}\n{response.text}"
 
-# -------------------------------
-# Analysis Trigger
-# -------------------------------
 if uploaded_files and model_choice and api_key:
     if st.button("🚀 Run Comparative Analysis"):
         scripts = read_scripts(uploaded_files)
