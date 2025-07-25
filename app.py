@@ -70,22 +70,43 @@ if uploaded_files and model_choice and api_key:
         scripts = read_scripts(uploaded_files)
 
         prompt = f"""
-You are an expert in television drama analysis. Analyze and compare the following {len(scripts)} Hindi TV serial scripts in detail. The scripts contain dialogues in English and Hindi (written in English script). DO NOT translate Hindi parts — instead, extract and highlight them.
+You are an expert in Indian TV serial screenwriting and narrative evaluation.
 
-Your response should include the following structured sections:
-1. EXECUTIVE SUMMARY: Key takeaways about tone, themes, character shifts, and language use.
-2. SCRIPT SYNOPSIS: 150–200 word summary for each episode.
-3. HINDI DIALOGUES: List 8–10 notable Hindi (Roman-script) lines that reflect character emotion or plot.
-4. COMPARATIVE ANALYSIS:
-   - Narrative Structure: Beginning, conflict, climax, resolution comparison
-   - Character Development: Presence, emotional arc, maturity, conflict
-   - Dialogue Style: Hinglish patterns, casual vs poetic tone
-   - Themes and Morality: Love, betrayal, revenge, tradition, modernity
-   - Sentiment Arcs: Emotional tone changes across scenes
-   - Scene Variety and Pacing
-   - Visual Imagination and Setting
+Your task is to provide a **professional comparative analysis** of {len(scripts)} episodes of a Hindi-English TV serial. These scripts are written in English and Hindi (in Roman/English script). The focus is not just to summarize, but to compare and evaluate how the script has evolved across episodes and what could be improved.
 
-Make the response comprehensive and creatively narrated.
+### DELIVER THE FOLLOWING SECTIONS:
+
+1. **EXECUTIVE SUMMARY**  
+   Provide a concise 250-word summary that compares how the story, emotion, pacing, and characters have shifted across the scripts. Highlight what’s working well and where the creative direction seems weak.
+
+2. **SYNOPSIS FOR EACH EPISODE**  
+   Provide a 150–200 word summary per script, covering story arc, emotional tone, and setting.
+
+3. **NOTABLE HINDI (ROMANIZED) DIALOGUES**  
+   List 10 strong or emotionally significant Hindi-in-English lines across all episodes. Identify the speaker and briefly explain their emotional or narrative importance.
+
+4. **DETAILED COMPARATIVE DEVELOPMENT ANALYSIS**  
+   For each area below, provide side-by-side comparison AND explain how the script has improved, stagnated, or declined in Episode 2 vs Episode 1:
+
+   - **Narrative Structure**  
+     (What new conflicts are introduced? Are subplots resolving or dragging?)
+   - **Character Development**  
+     (Which characters have shown growth? Who is becoming flat or inconsistent?)
+   - **Dialogues and Language**  
+     (Changes in tone, more poetic, sharper, or more cliché? Any noticeable shifts in Hinglish usage?)
+   - **Themes and Moral Messaging**  
+     (What underlying values or messages are becoming prominent or diluted?)
+   - **Emotional & Sentiment Flow**  
+     (Pacing of emotional highs/lows—what works, what feels forced?)
+   - **Scene Pacing and Visual Rhythm**  
+     (Has pacing improved? Are transitions smoother? Visual imagination better?)
+
+5. **RECOMMENDATIONS**  
+   Offer creative suggestions on how the storyline, character portrayal, and dialogues can be elevated in the next episodes. Be specific and not generic.
+
+Be detailed, use full paragraphs. Focus on evolution across episodes. Don't summarize section-wise without analysis. Do not translate Hindi lines—interpret them contextually.
+
+Here are the scripts:
 """ + "\n\n---\n\n".join([f"Script {i+1}:\n{scripts[i]}" for i in range(len(scripts))])
 
         with st.spinner("Analyzing scripts..."):
@@ -101,8 +122,8 @@ Make the response comprehensive and creatively narrated.
             except Exception as e:
                 result = f"Error during analysis: {e}"
 
-        st.subheader("🧾 Detailed Script Analysis")
+        st.subheader("🧾 Final Script Evolution Analysis")
         st.markdown(result)
-        st.download_button("💾 Download Analysis", result, file_name="detailed_script_analysis.txt")
+        st.download_button("💾 Download Analysis", result, file_name="script_comparative_analysis.txt")
 else:
     st.info("Upload at least one script, select a model, and enter API key.")
